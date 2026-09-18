@@ -13,6 +13,7 @@ format:
     slide-number: true
     embed-resources: true
 date: "22 September 2026"
+date-format: "Do MMMM YYYY"
 preload-iframes: false
 ---
 
@@ -78,50 +79,33 @@ font-size: 30px;
 
 /*logo*/
 .reveal .slide-logo {
-  height: 8% !important;
+  height: 5% !important;
   max-width: unset !important;
   max-height: unset !important;
+  padding: 10px
 }
 
-/*Shiny input and outputs*/
-.shiny-input-container, .shiny-bound-output {
-box-sizing: border-box;
-color: rgb(51, 51, 51);
-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-font-size: 1.4em;
-line-height: 50px;
-margin-bottom: 30px;
-max-width: 100%;
-width: 50% !important;
-}
-
-.shiny-input-number .form-control .shiny-bound-input {
-font-size: 1.2em;
-width: 50% !important;
-margin-bottom: 30px;
-}
-
-input {
-  height: 60px;
-  width: 300px;
-  font-size: 1em;
-}
 
 ```
 
+:::{.incremental .highlight-last}
 -   What is Shiny?
 -   Best practices in Shiny development
 -   How Shinyscholar helps to avoid common problems
 -   Disagapp and MetaInsight as examples
 -   Limitations and future directions
+:::
 
 ## About me
 
 ::: columns
 ::: {.column width="60%"}
+:::{.incremental .highlight-last}
 -   Background in plant sciences and agricultural science
 -   Latecomer to R, starting in 2018
--   RSE in Geostatistics for Global Health with Claudio Fronterre and Emanuele Giorgi
+-   Biostats group in Leicester 2023-2026
+-   RSE in Geostatistics for Population Health with Claudio Fronterre and Emanuele Giorgi
+:::
 :::
 ::: {.column width="10%"}
 :::
@@ -130,13 +114,17 @@ input {
 :::
 :::
 
+## More of a problem statement?
+
+- Little point developing fancy models if those who could benefit can't use them
+
 ## Shiny enables the creation of applications in R
 ::: columns
 ::: {.column width="70%"}
--   R package developed by Posit/Rstudio, first released in 2012
--   Framework for developing interactive applications using R
--   Can run locally or online
--   Make it much easier to share code with non R-users
+- Reactive framework for developing applications using R    
+- Developed by Posit/Rstudio, first released in 2012     
+- Can run locally or online
+- Make it much easier to share code with non R-users
 :::
 ::: {.column width="30%"}
 
@@ -154,35 +142,23 @@ input {
 
 ## Perceived negatives of Shiny
 
+:::{.incremental .highlight-last}
 - Difficult or impossible to test
 - Slow
 - Hangs during slow tasks
 - Limited features for authentication and saving state
+:::
 
 :::footer
-https://reside-ic.github.io/articles/web-apps/
-
+<a href="https://reside-ic.github.io/articles/web-apps/" target="_blank">https://reside-ic.github.io/articles/web-apps/</a>
 :::
 
 ## Positives of Shiny
 
+:::{.incremental .highlight-last}
 - Easy to deploy and runs as a single service
 - Very easy to run locally
 - Statisticians are familiar with R
-
-
-## Data flows through an analysis in discrete steps 
-
-<img src="images/data_pipeline.svg" class="centre_image" >
- 
-::: footer
-- Adapted from <a href="https://r4ds.hadley.nz/intro" target="_blank">Wickham (2022)</a>
-:::
- 
-::: {.notes}
--   Analytical apps have a flow of data through them
--   Similar to an analysis, but we are providing options for the user to take their own particular path
--   Distinguish between datavis apps and analysis apps
 :::
 
 ## Shiny apps are becoming increasingly popular in academia
@@ -200,7 +176,7 @@ year <- c(2012, 2015:2025)
 apps <- c(1, 4, 3, 12, 17, 39, 69, 75, 100, 154, 151, 216)
 mod <- lm(log(apps) ~ year)
 
-par(cex = 1.5, bg = '#e4fbf8')
+par(cex = 1.5, bg = '#d8e6e4')
 plot(year, apps, pch = 16, xlab = '', ylab = 'Number of publications')
 lines(seq(2012, 2025, 0.1), exp(predict(mod, data.frame(year = seq(2012, 2025, 0.1)))), col = 'blue')
 
@@ -215,28 +191,14 @@ lines(seq(2012, 2025, 0.1), exp(predict(mod, data.frame(year = seq(2012, 2025, 0
 
 ## Creating analytical apps lowers the barrier of entry
 
+:::{.incremental .highlight-last}
 - Provide guidance throughout a complex analysis
 - Enable users without coding skills to access cutting-edge analyses
 - Enable access for restricted users e.g. in NHS
+:::
 
 ::: {.notes}
 - Link to data pipeline - provide handrails for the user 
-:::
-
-## Shiny apps consist of a user interface object (UI) and a server object {.largecode}
-
-```{r eval = FALSE, echo = TRUE}
-ui <- fluidPage() 
-
-server <- function(input, output) {}
-
-shinyApp(ui = ui, server = server)
-```
-
-::: {.notes}
-- However complex, all apps have this structure
-- UI creates a webpage and is displayed in the browser
-- Server code is run on a server but unlike normal R code, it can be run multiple times
 :::
 
 ## Data is transferred between the UI and server through the input and output {.mediumcode}
@@ -244,11 +206,11 @@ shinyApp(ui = ui, server = server)
 ```{r eval = FALSE, echo = TRUE}
 ui <- fluidPage(
   numericInput("number", "Enter a number", value = 5),
-  textOutput("answer"))
+  textOutput("answer")
+  )
 
-server <- function(input, output) {
+server <- function(input, output) 
   output$answer <- renderText(input$number * 10)
-}
 
 shinyApp(ui, server)
 ```
@@ -258,20 +220,6 @@ shinyApp(ui, server)
 - Whenever input values change, the code that uses them is rerun
 - The beauty of shiny is that we don't have to manage the (complicated) communication process between the web page and the server
 :::
-
-## The ease of development provides advantages and disadvantages
-
--   Simple apps can be created in an afternoon
--   Academics rarely have training in software development
--   What started simple can quickly snowball to become very complex
-
-## App design
-
--  What features do we need?
-    - Generic
-    - Specific
--  How should the code be structured?
--  How do we make sure that it works?
 
 ## What characteristics should academic apps have?
 
@@ -313,14 +261,6 @@ shinyApp(ui, server)
 - Contracts are short, so it is important people unfamiliar with the code can understand what is happening.
 
 :::
-
-## Reproducibility futureproofs analyses made in an app
-
--   Avoid the app being a black box
--   As a tool for learning
--   Allow users to edit and refine the analysis
--   Increasingly required when findings are published
--   If the app goes offline, the user can still get the same results
 
 ## How should app code be structured?
 
@@ -365,31 +305,13 @@ shinyApp(ui, server)
 :::
 :::
 
-## Functions are central to R programming {.largecode}
-
--   Separate normal R code from application logic
--   Easier to debug
--   Enable reuse of code
--   Enable testing of the core functionality
-
-```{r eval = FALSE, echo = TRUE}
-multiply_by_ten <- function(x){
-  x * 10
-}
-```
-
 ## Modules enable apps to be broken down into self-contained chunks
 
-::: columns
-::: {.column width="80%"}
+:::{.incremental .highlight-last}
 -   Inputs and outputs for different parts are separated
 -   Simplifies naming of objects
 -   Easier to navigate files and maintain code
 -   But they need to be able to communicate...
-:::
-::: {.column width="20%"}
-<img src="images/modules.svg" align="right" height = 500px >
-:::
 :::
 
 ::: {.notes}
@@ -450,10 +372,18 @@ multiply_by_ten <- function(x){
 
 ## Wallace provided the basis to create a template
 
+:::{.incremental .highlight-last}
+-  Templates / frameworks exist for other use cases
 -  Lots of useful features that are difficult to implement
--  Removed all the modules
 -  Adapted files so they could be edited programmatically
 -  Made various changes to add functionality 
+:::
+
+::: footer
+<a href="https://cran.r-project.org/package=golem" target="_blank">golem</a>,
+<a href="https://cran.r-project.org/package=rhino" target="_blank">rhino</a>,
+<a href="https://cran.r-project.org/package=teal" target="_blank">teal</a>
+:::
 
 ## Shinyscholar helps create high quality analytical applications
 
@@ -468,13 +398,15 @@ multiply_by_ten <- function(x){
 :::
 :::
 
-## Shinyscholar enforces a strict structure
+## Shinyscholar enforces a strict architecture
 
+:::{.incremental .highlight-last}
 -   Analyses are split into components and modules
 -   Each module calls one function
--   Each module is reproduced by a markdown chunk
+-   Each module is reproduced by an Rmarkdown chunk
 -   Data is passed between modules through `common`
 -   Apps are distributed as packages
+:::
 
 ## `create_template()` creates an empty app {.mediumcode}
 
@@ -490,13 +422,15 @@ modules <- data.frame(
 "result" = c(FALSE, FALSE, TRUE, TRUE),
 "rmd" = c(TRUE, TRUE, TRUE, TRUE),
 "save" = c(TRUE, TRUE, TRUE, TRUE),
-"async" = c(TRUE, TRUE, TRUE, TRUE))
-
+"async" = c(TRUE, TRUE, TRUE, TRUE),
+"download" = c(FALSE, FALSE, TRUE, TRUE))
 ```
 
 ```{r val = TRUE, echo = FALSE}
 knitr::kable(modules,format = "html")
 ```
+
+## `create_template()` creates an empty app {.mediumcode}
 
 ```{r eval = FALSE, echo = TRUE}
 
@@ -513,9 +447,6 @@ demo::run_demo()
 ::: {.notes}
  - Forces a design phase upon developers
 :::
-
-## New apps can also be generated inside the shinyscholar app
-<img src="images/ss_template.png" class="centre_image" >
 
 ## Developers can then start developing modules
 <img src="images/demo.png" class="centre_image" >
@@ -536,42 +467,14 @@ demo::run_demo()
 :::
 :::
 
-## {data-menu-title="Shinyscholar intro"}
-<img src="images/ss_intro.png" class="centre_image" >
-
-## {data-menu-title="Shinyscholar guidance"}
-<img src="images/ss_guidance.png" class="centre_image" >
-
-::: {.notes}
-- Point out guidance and attribution
-:::
-
-## {data-menu-title="Shinyscholar code"}
-<img src="images/ss_code.png" class="centre_image" >
-
-::: {.notes}
-- Easy to understand what code is doing what
-:::
-
-## {data-menu-title="Shinyscholar query"}
-<img src="images/ss_query.png" class="centre_image" >
-
-::: {.notes}
-- Logger contains details
-:::
-
-## {data-menu-title="Shinyscholar plot"}
-<img src="images/ss_plot.png" class="centre_image" >
-
-## {data-menu-title="Shinyscholar plot"}
-<img src="images/ss_reprod.png" class="centre_image" >
-
 ## Markdown files can be merged to replicate the analysis
 
+:::{.incremental .highlight-last}
 -   When a module is used an object becomes `TRUE`
--   Input values are stored and *knitted* into the markdown
+-   Input values are stored and *knitted* into the Rmarkdown
 -   Each chunk of the markdown calls the same function as the module in the app
 -   The chunks for used modules are combined into one `.Rmd` file
+:::
 
 ## Input values are copied into the markdown {.mediumcode}
 
@@ -620,54 +523,73 @@ comp_mod_number <- common$meta$comp_mod$number # transfer to Rmd
 -   Code required for saving/loading and reproducibility is repetitive
 :::
 
-## Disaggregation regression enables high resolution disease mapping
-
-::: columns
-::: {.column width="20%"}
-:::
-::: {.column width="30%"}
-<img src="images/mad_shape.png" >
-:::
-::: {.column width="30%"}
-<img src="images/mad_pred.png">
-:::
-::: {.column width="20%"}
-:::
-:::
-
-## There are several types of data to process
-<img src="images/disag_data_types_path.svg" class="centre_image" >
-
-## Modules are classified depending on their necessity
-<img src="images/disagg_modules_path.svg" class="centre_image" >
-
-## {data-menu-title="Disagapp demo"}
-<iframe width="100%" height="100%" src="http://127.0.0.1:5000"></iframe>
-
-## The same analysis reproduced
-```{r}
-#| echo: false
-#| warning: false
-#| class-output: "sourceCode r"
-
-cat(readLines("disagapp-session.Rmd"), sep = "\n")
+## Test
+```{r echo = TRUE, eval = FALSE}
+app <- shinytest2::AppDriver$new(app_dir = system.file("shiny", package = "metainsight"))
+app$set_inputs(tabs = "setup")
+app$upload_file("setup_load-file1" = file.path(test_data_dir, "continuous_wide_disconnected.csv"))
+app$click("setup_load-run")
+app$set_inputs(setupSel = "setup_configure")
+app$click("setup_configure-run")
+common <- app$get_value(export = "common")
+ 
 ```
 
+## Async problem
 
-## Summary
+<demo app>
 
--  Shiny apps are easy to create and help disseminate methods
--  Current software development practices in academic apps could be improved
--  Shinyscholar helps create apps that are:
-    - Open, attributable, instructive, reproducible, reliable and maintainable
+## Extended task and mirai
 
-## Github resources
 
--  <a href="https://github.com/simon-smart88 " target="_blank">https://github.com/simon-smart88</a>
--   shinyscholar
--   disagapp
--   These slides
--   Introduction to shiny workshop
+
+
+
+
+
+## Disaggregation regression enables high resolution disease mapping
+<img src="images/disagg_modules_path.svg" class="centre_image" >
+
+## Disagapp demo
+
+
+## 
+
+<img src="images/metainsight_existing.png" width = 1400 alt = "Screenshot of the existing app" class = "centre_image">
+
+
+
+## Limitations
+
+:::{.incremental .highlight-last}
+- Added complexity
+- UI design may not be appropriate for all apps
+- Full paths for uploaded files cannot be reproduced
+- Reproducibility is only a snapshot
+- Code has to be rerun to generate a report
+- Hosting
+:::
+
+## Future development
+
+:::{.incremental .highlight-last}
+- More options for UI
+- Updating the logger mid-way through long tasks
+- Spinning up exact copies from saved files
+- Python? 
+:::
+
+## Resources
+
+- CRAN:
+  - <a href="https://cran.r-project.org/package=shinyscholar" target="_blank">shinyscholar</a>
+  - <a href="https://cran.r-project.org/package=metainsight" target="_blank">metainsight</a>
+
+-  <a href="https://github.com/simon-smart88 " target="_blank">github.com/simon-smart88</a>:
+  -   shinyscholar
+  -   disagapp
+  -   These slides (bobw_seminar)
+- <a href="https://github.com/CRSU-Apps/MetaInsight/" target="_blank">github.com/CRSU-Apps/MetaInsight/</a>
 
 ## Acknowledgments
 
@@ -675,14 +597,16 @@ cat(readLines("disagapp-session.Rmd"), sep = "\n")
 ::: {.column width="50%"}
 -   Wellcome
 -   Wallace developers
--   Tim
--   CRSU
+-   Tim Lucas and Alex Sutton
+-   CRSU developers
 :::
 
 ::: {.column width="50%"}
 <div> 
 <img src="images/wellcome_logo.png" width="300" style = "display: block;">
 <img src="images/wallace_logo.png" width="300" style = "display: block;">
+<img src="images/uol_logo.png" width="300" style = "display: block;">
+<img src="images/crsu_logo.png" width="300" style = "display: block;">
 </div>
 :::
 :::

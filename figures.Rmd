@@ -1,0 +1,67 @@
+```{r}
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
+
+cdf <- readxl::read_excel("~/Documents/shinyscholar/paper/categorical.xlsx")
+
+summary_df <- cdf %>%
+  gather(Column, Response) %>%
+  count(Column, Response) %>%
+  pivot_wider(names_from = Response, values_from = n, values_fill = list(n = 0))
+
+
+
+#reorder rows and columns
+summary_df$Column <- factor(summary_df$Column, levels = rev(c("Cite packages in paper", "Deployed", "Cite packages in app",  "Instructive", "Logging", "Reproducible", "Save and load", "Source code available", "Functions", "Modular", "Packaged", "Unit tests", "End-to-end tests")))
+
+summary_df <- summary_df %>% select(!(Elsewhere:Shinyapps))
+summary_df <- summary_df[summary_df$Column != "Deployed",]
+
+
+summary_df <- summary_df[order(summary_df$Column), c(1:5)]
+
+
+
+names <- summary_df$Column
+summary_df <- subset(summary_df, select = -c(Column) )
+suppressWarnings(rownames(summary_df) <- names)
+
+svg("images/app_features.svg", width = 9, height = 5)
+cols = rev(hcl.colors(ncol(summary_df), palette = "Zissou 1"))
+par(mar = c(5,12,1,10), xpd = TRUE, bg = '#d8e6e4')
+barplot(as.matrix(t(summary_df)), horiz = TRUE, las = 1, col = cols, xlab = "Frequency")
+legend("topright", legend = c("Undetermined", colnames(summary_df)[2:4]), inset = c(-0.4, 0.35), col = cols, pch = 15, bty = "n")
+dev.off()
+
+```
+
+```{r linehist}
+sdf <- readxl::read_excel("~/Documents/shinyscholar/paper/api_results.xlsx")
+
+cols = hcl.colors(7, palette = "Zissou 1")
+
+sdf$server_fraction <- (sdf$`server or app lines`/sdf$lines) * 100
+sdf$lines_per_file <- sdf$lines/sdf$files
+
+svg("images/code_features.svg", width = 8, height = 6)
+par(mfrow = c(2,2), mar=c(4,4,2,1), bg = '#d8e6e4')
+hist(sdf$lines, breaks = seq(0, 30000, 2500), main = '', xlab = "Lines", col = cols[1])
+hist(sdf$lines[sdf$Packaged == "Yes"], breaks = seq(0, 30000, 2500), add = TRUE, col = cols[2])
+hist(sdf$lines[sdf$Modular == "Yes"], breaks = seq(0, 30000, 2500), add = TRUE, col = cols[5])
+title(main = "(a)", adj = 0)
+hist(sdf$`server or app lines`, breaks = seq(0, 10000, 1000), main = '', xlab = "Lines", col = cols[1])
+hist(sdf$`server or app lines`[sdf$Packaged == "Yes"], breaks = seq(0, 10000, 1000), add = TRUE, col = cols[2])
+hist(sdf$`server or app lines`[sdf$Modular == "Yes"], breaks = seq(0, 10000, 1000), add = TRUE, col = cols[5])
+legend("topright", legend = c("Not modular or packaged", "Packaged not modular", "Modular and packaged"), pch = 15, col = c(cols[1], cols[2], cols[5]), bty = "n")
+title(main = "(b)", adj = 0)
+hist(sdf$lines_per_file, breaks = seq(0, 4000, 400), main = '', xlab = "Lines", col = cols[1])
+hist(sdf$lines_per_file[sdf$Packaged == "Yes"], breaks = seq(0, 4000, 400), add = TRUE, col = cols[2])
+hist(sdf$lines_per_file[sdf$Modular == "Yes"], breaks = seq(0, 4000, 400), add = TRUE, col = cols[5])
+title(main = "(c)", adj = 0)
+hist(sdf$server_fraction, breaks = seq(0, 100, 10), main = '', xlab = "%", col = cols[1])
+hist(sdf$server_fraction[sdf$Packaged == "Yes"], breaks = seq(0, 100, 10), add = TRUE, col = cols[2])
+hist(sdf$server_fraction[sdf$Modular == "Yes"], breaks = seq(0, 100, 10), add = TRUE, col = cols[5])
+title(main = "(d)", adj = 0)
+dev.off()
+```
+
